@@ -1,7 +1,8 @@
 # HSA redis cluster
 
 <h4>Redis Instance</h4>
-Connect to container, add/get test key
+
+Connect to container, set/get test key
 ```
 docker exec -it {container_name} redis-cli
 
@@ -10,10 +11,12 @@ HGETALL user1
 ```
 
 <h4>Redis Sentinel</h4>
+
 Redis Sentinel is a distributed system consisting of multiple Redis instances started in sentinel mode (called Sentinels). Monitoring of Redis Primary-Replica(s) work, automatic failover.
 <img src="./images/redis_sentinel.png" width="600">
 
 <h4>Redis Cluster</h4>
+
 [Cluster specification](https://redis.io/docs/latest/operate/oss_and_stack/reference/cluster-spec/)
 
 <img src="./images/redis_cluster.png" width="600">
@@ -33,7 +36,7 @@ Show cluster nodes (when cluster mode is on)
 2. Try all eviction strategies
 3. Implement Probabilistic cache cleaning
 
-<h3>Description</h3>
+<h3>Homework</h3>
 
 <h4>Run Redis in Master/Slave mode</h4>
 
@@ -48,6 +51,7 @@ Check primary/replica info
 <img src="./images/redis_master_info.png" width="500"> <img src="./images/redis_slave_info.png" width="450">
 
 <h4>Run Redis in Master/Slave mode with Sentinel</h4>
+
 Sentinel will automatically detects the point of failure and bring the cluster back to stable mode.
 ```
 docker-compose -f docker-compose-master-slave-sentinel.yml up -d
@@ -96,6 +100,7 @@ Response: Kyiv
 Response: Kyiv
 Response: Kyiv
 ```
+
 Update record in db to replace cache value fetched in endpoint (db client used):
 ```
 update users set city = 'Lviv' where name = 'Vasyl'
