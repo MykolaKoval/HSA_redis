@@ -1,0 +1,91 @@
+version: '3.9'
+services:
+
+  redis-master:
+    image: redis:7.4
+    command: redis-server
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+
+  redis-slave1:
+    image: redis:7.4
+    ports:
+      - 6380:6379
+    command: redis-server --slaveof redis-master 6379
+    depends_on:
+      - redis-master
+    networks:
+      - backend
+
+  redis-slave2:
+    image: redis:7.4
+    ports:
+      - 6381:6379
+    command: redis-server --slaveof redis-master 6379
+    depends_on:
+      - redis-master
+    networks:
+      - backend
+
+  redis-sentinel1:
+    image:  redis:7.4
+    ports:
+      - 5001:5000
+    command: >
+      sh -c '
+        mkdir -p /usr/local/etc/sentinel &&
+        cp /etc/sentinel.conf /usr/local/etc/sentinel/sentinel.conf &&
+        redis-server /usr/local/etc/sentinel/sentinel.conf --sentinel
+      '
+    volumes:
+      - "./sentinel/sentinel.conf:/etc/sentinel.conf"
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    networks:
+      - backend
+
+  redis-sentinel2:
+    image: redis:7.4
+    ports:
+      - 5002:5000
+    command: >
+      sh -c '
+        mkdir -p /usr/local/etc/sentinel &&
+        cp /etc/sentinel.conf /usr/local/etc/sentinel/sentinel.conf &&
+        redis-server /usr/local/etc/sentinel/sentinel.conf --sentinel
+      '
+    volumes:
+      - "./sentinel/sentinel.conf:/etc/sentinel.conf"
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    networks:
+      - backend
+
+  redis-sentinel3:
+    image: redis:7.4
+    ports:
+      - 5003:5000
+    command: >
+      sh -c '
+        mkdir -p /usr/local/etc/sentinel &&
+        cp /etc/sentinel.conf /usr/local/etc/sentinel/sentinel.conf &&
+        redis-server /usr/local/etc/sentinel/sentinel.conf --sentinel
+      '
+    volumes:
+      - "./sentinel/sentinel.conf:/etc/sentinel.conf"
+    depends_on:
+      - redis-master
+      - redis-slave1
+      - redis-slave2
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

@@ -1,0 +1,34 @@
+version: '3.9'
+services:
+
+  redis-master:
+    image: redis:7.4
+    command: redis-server
+    ports:
+      - 6379:6379
+    networks:
+      - backend
+
+  redis-slave1:
+    image: redis:7.4
+    ports:
+      - 6380:6379
+    command: redis-server --slaveof redis-master 6379
+    depends_on:
+      - redis-master
+    networks:
+      - backend
+
+  redis-slave2:
+    image: redis:7.4
+    ports:
+      - 6381:6379
+    command: redis-server --slaveof redis-master 6379
+    depends_on:
+      - redis-master
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

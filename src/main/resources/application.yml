@@ -1,0 +1,27 @@
+management:
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, metrics
+
+spring:
+  datasource:
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://db:3306/test_db
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+cache:
+  early-refresh-period-sec: 300
+  redis:
+    host: redis
+    port: 6379
+    user: ${REDIS_USER}
+    password: ${REDIS_USER_PASSWORD}
