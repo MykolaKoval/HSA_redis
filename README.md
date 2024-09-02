@@ -13,6 +13,7 @@ HGETALL user1
 <h4>Redis Sentinel</h4>
 
 Redis Sentinel is a distributed system consisting of multiple Redis instances started in sentinel mode (called Sentinels). Monitoring of Redis Primary-Replica(s) work, automatic failover.
+
 <img src="./images/redis_sentinel.png" width="600">
 
 <h4>Redis Cluster</h4>
@@ -21,9 +22,7 @@ Redis Sentinel is a distributed system consisting of multiple Redis instances st
 
 <img src="./images/redis_cluster.png" width="600">
 
-To perform their tasks all the cluster nodes are connected using a TCP bus and a binary protocol, called the Redis Cluster Bus.
-
-Redis Cluster does not support multiple databases like the standalone version of Redis.
+To perform their tasks all the cluster nodes are connected using a TCP bus and a binary protocol, called the Redis Cluster Bus. Redis Cluster does not support multiple databases like the standalone version of Redis.
 
 Show cluster nodes (when cluster mode is on)
 ```
@@ -56,13 +55,13 @@ Sentinel will automatically detects the point of failure and bring the cluster b
 ```
 docker-compose -f docker-compose-master-slave-sentinel.yml up -d
 ```
-Note: after redis master was dropped, new master was chosen. However sentinel couldn't connect to new master node trying to resolve old host name 'redis-master'.
+Note: after redis master was dropped, new master was chosen. However sentinel couldn't connect to new master node unsuccessfully trying to resolve old host name 'redis-master'.
 
 <h4>Redis Keys Eviction verification</h4>
 
 [Key eviction strategies](https://redis.io/blog/cache-eviction-strategies/)
 
-Default values are maxmemory=0 (no memory limits), maxmemory-policy=noeviction (returns an error when the memory limit is reached)
+Default values are ``maxmemory=0`` (no memory limits),`` maxmemory-policy=noeviction`` (returns an error when the memory limit is reached)
 
 Get/set ``maxmemory``, ``maxmemory-policy`` values:
 ```
@@ -93,7 +92,7 @@ Run app, script will create database and insert test data
 docker-compose up -d
 ```
 
-Fill cache with default data from database, hit endpoint several times
+Fill cache with default data from database hitting endpoint several times
 ```
 GET http://localhost:8080/api/cache/probabilistic-value?cacheKey=Vasyl
 Response: Kyiv
@@ -101,13 +100,13 @@ Response: Kyiv
 Response: Kyiv
 ```
 
-Update record in db to replace cache value fetched in endpoint (db client used):
+Update record in db to be fetched by endpoint and put to cache (db client used):
 ```
 update users set city = 'Lviv' where name = 'Vasyl'
 ```
 
 Modify key TTL = 500 to be closer for setting ``early-refresh-period-sec: 300`` (redis insight client used)
-<img src="./images/cache_ttl_updated.png" width="600">
+<img src="./images/cache_ttl_updated.png" width="900">
 
 Hit endpoint several times
 ```
@@ -118,4 +117,4 @@ Response: Kyiv
 Response: Lviv
 Response: Lviv
 ```
-<img src="./images/cache_value_updated.png" width="600">
+<img src="./images/cache_value_updated.png" width="900">
