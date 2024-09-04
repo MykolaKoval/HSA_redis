@@ -26,6 +26,11 @@ public class CacheController {
         return cacheService.getProbabilisticValue(cacheKey);
     }
 
+    @GetMapping(path = "/probabilistic-value-with-lock")
+    public String getProbabilisticValueWithLock(@RequestParam("cacheKey") String cacheKey) {
+        return cacheService.getProbabilisticValueWithLock(cacheKey);
+    }
+
     @GetMapping(path = "/ttl")
     public long getTll(@RequestParam("cacheKey") String cacheKey) {
         return cacheService.getTtl(cacheKey);
