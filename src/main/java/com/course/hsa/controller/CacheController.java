@@ -12,7 +12,7 @@ public class CacheController {
     private final CacheService cacheService;
 
     @PostMapping(path = "/fill")
-    public void getAutocomplete(@RequestParam("addCount") Integer addCount, @RequestParam(name = "ttl", required = false) Long ttl) {
+    public void fillCache(@RequestParam("addCount") Integer addCount, @RequestParam(name = "ttl", required = false) Long ttl) {
         cacheService.fillCache(addCount, ttl);
     }
 

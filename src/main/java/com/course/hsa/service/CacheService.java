@@ -28,6 +28,7 @@ public class CacheService {
     private final JedisPooled jedis;
     private final UserRepository userRepository;
 
+    // Fot testing eviction policies
     public void fillCache(Integer addCount, Long ttl) {
         for (int i = 0; i < addCount; i++) {
             if (ttl != null) {
@@ -47,6 +48,7 @@ public class CacheService {
         return jedis.ttl(cacheKey);
     }
 
+    // Pure probabilistic cache cleaning approach
     public String getProbabilisticValue(String cacheKey) {
         var ttl = getTtl(cacheKey);
         if (ttl <= 0) {
@@ -57,6 +59,7 @@ public class CacheService {
         return jedis.get(cacheKey);
     }
 
+    // Improved approach: probabilistic cache cleaning + key locking on refresh
     public String getProbabilisticValueWithLock(String cacheKey) {
         var ttl = getTtl(cacheKey);
         if (ttl <= 0) {
@@ -80,18 +83,19 @@ public class CacheService {
     }
 
     public boolean isRefreshLockMissing(String cacheKey) {
-        var refreshLock = String.format(KEY_REFRESH_LOCK_TEMPLATE, cacheKey);
-        return !jedis.exists(refreshLock);
+        return !jedis.exists(getLockKey(cacheKey));
     }
 
     public void acquireRefreshLock(String cacheKey) {
-        var refreshLock = String.format(KEY_REFRESH_LOCK_TEMPLATE, cacheKey);
-        jedis.set(refreshLock, "key is refreshing");
+        jedis.set(getLockKey(cacheKey), "key is refreshing");
     }
 
     public void releaseRefreshLock(String cacheKey) {
-        var refreshLock = String.format(KEY_REFRESH_LOCK_TEMPLATE, cacheKey);
-        jedis.expire(refreshLock, 0);
+        jedis.expire(getLockKey(cacheKey), 0);
+    }
+
+    private static String getLockKey(String cacheKey) {
+        return String.format(KEY_REFRESH_LOCK_TEMPLATE, cacheKey);
     }
 
     private void fillCache(String cacheKey) {
