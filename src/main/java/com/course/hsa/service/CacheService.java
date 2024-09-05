@@ -69,7 +69,7 @@ public class CacheService {
         return jedis.get(cacheKey);
     }
 
-    @Scheduled(cron= "0/5 * * ? * *")
+    @Scheduled(cron = "0/5 * * ? * *")
     public void setEarlyRefreshTtl() {
         log.info("Cache updated: key=Vasyl, ttl=500");
         jedis.set("Vasyl", "Default value", SetParams.setParams().ex(500));
@@ -95,7 +95,6 @@ public class CacheService {
     }
 
     private void fillCache(String cacheKey) {
-        log.info("Db is requested");
         var user = userRepository.findByName(cacheKey)
                 .orElseThrow(() -> new IllegalArgumentException(String.format(USER_NOT_FOUND, cacheKey)));
         jedis.set(cacheKey, user.getCity(), SetParams.setParams().ex(CACHE_TTL));

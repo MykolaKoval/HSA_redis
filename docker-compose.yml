@@ -1,5 +1,53 @@
 version: '3.9'
 services:
+  telegraf:
+    image: telegraf:latest
+    user: root
+    entrypoint: "telegraf"
+    volumes:
+      - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - '127.0.0.1:8125:8125/udp'
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    networks:
+      - backend
+
+  influxdb:
+    image: influxdb:1.8-alpine
+    environment:
+      - INFLUXDB_DB=influx
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+    ports:
+      - '127.0.0.1:8086:8086'
+    volumes:
+      - ./:/imports
+      - influxdb_data:/var/lib/influxdb
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana:8.0.2
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=
+    ports:
+      - '127.0.0.1:3001:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/dashboards/:/var/lib/grafana/dashboards/
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    networks:
+      - backend
 
   redis:
     image: redis:7.4
@@ -86,6 +134,8 @@ volumes:
   redis_data:
   redis_insight_data:
   db_data:
+  grafana_data: {}
+  influxdb_data: {}
 
 networks:
   backend:

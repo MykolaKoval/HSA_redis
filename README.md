@@ -110,33 +110,26 @@ Run app, script will create database and insert test data
 ```
 docker-compose up -d
 ```
+<h4>Verification</h4>
 
-Fill cache with default data from database hitting endpoint several times
+There are 2 solutions provided:
+
+1. Probabilistic cache refresh
 ```
 GET http://localhost:8080/api/cache/probabilistic-value?cacheKey=Vasyl
-Response: Kyiv
-Response: Kyiv
-Response: Kyiv
+./get-from-cache.sh
+```
+2. Probabilistic cache refresh + Key lock
+```
+http://127.0.0.1:8080/api/cache/probabilistic-value-with-lock?cacheKey=Vasyl
+.get-from-cache-with-lock.sh
 ```
 
-Update record in db to be fetched by endpoint and put to cache (db client used):
-```
-update users set city = 'Lviv' where name = 'Vasyl'
-```
+To compare solutions effectiveness, script is run during 60 sec together with scheduler which reset key TTL to 500 (early refresh) and initiates cache refreshing.
 
-Modify key TTL = 500 to be closer for setting ``early-refresh-period-sec: 300`` (redis insight client used)
-<img src="./images/cache_ttl_updated.png" width="900">
+DB queries metrics show reducing calls to db confirming 'Key lock' improvement:
 
-Hit endpoint several times
-```
-GET http://localhost:8080/api/cache/probabilistic-value?cacheKey=Vasyl
-Response: Kyiv
-Response: Kyiv
-Response: Kyiv
-Response: Lviv
-Response: Lviv
-```
-<img src="./images/cache_value_updated.png" width="900">
+<img src="./images/quries_count.png" width="900">
 
 
 
